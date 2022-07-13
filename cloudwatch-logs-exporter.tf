@@ -21,7 +21,7 @@ resource "random_string" "random" {
 }
 
 resource "aws_iam_role" "log_exporter" {
-  name = "log-exporter-${random_string.random.result}"
+  name = "log-exporter-${var.cloudwatch_logs_export_bucket}"
 
   assume_role_policy = <<EOF
 {
@@ -41,7 +41,7 @@ EOF
 }
 
 resource "aws_iam_role_policy" "log_exporter" {
-  name = "log-exporter-${random_string.random.result}"
+  name = "log-exporter-${var.cloudwatch_logs_export_bucket}"
   role = aws_iam_role.log_exporter.id
 
   policy = <<EOF
@@ -102,7 +102,7 @@ EOF
 
 resource "aws_lambda_function" "log_exporter" {
   filename         = data.archive_file.log_exporter.output_path
-  function_name    = "log-exporter-${random_string.random.result}"
+  function_name    = "log-exporter-${var.cloudwatch_logs_export_bucket}"
   role             = aws_iam_role.log_exporter.arn
   handler          = "cloudwatch-to-s3.lambda_handler"
   source_code_hash = data.archive_file.log_exporter.output_base64sha256
@@ -123,14 +123,14 @@ resource "aws_lambda_function" "log_exporter" {
 }
 
 resource "aws_cloudwatch_event_rule" "log_exporter" {
-  name                = "log-exporter-${random_string.random.result}"
+  name                = "log-exporter-${var.cloudwatch_logs_export_bucket}"
   description         = "Fires periodically to export logs to S3"
   schedule_expression = "rate(4 hours)"
 }
 
 resource "aws_cloudwatch_event_target" "log_exporter" {
   rule      = aws_cloudwatch_event_rule.log_exporter.name
-  target_id = "log-exporter-${random_string.random.result}"
+  target_id = "log-exporter-${var.cloudwatch_logs_export_bucket}"
   arn       = aws_lambda_function.log_exporter.arn
 }
 
@@ -220,6 +220,7 @@ resource "aws_kms_key" "kms" {
   deletion_window_in_days = 10
   enable_key_rotation     = true
   policy                  = join("", data.aws_iam_policy_document.kms.*.json)
+  alias                   = "log-exporter-${var.cloudwatch_logs_export_bucket}"
 }
 
 
