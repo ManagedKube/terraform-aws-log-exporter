@@ -181,7 +181,7 @@ data "aws_iam_policy_document" "kms" {
   }
 
   statement {
-    sid    = "Allow KMS to CloudWatch Log Group ${var.name}"
+    sid    = "Allow KMS to CloudWatch Log Group ${var.cloudwatch_logs_export_bucket}"
     effect = "Allow"
 
     actions = [
@@ -206,7 +206,7 @@ data "aws_iam_policy_document" "kms" {
     condition {
       test = "ArnEquals"
       variable = "kms:EncryptionContext:aws:logs:arn"
-      values = ["arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:${var.name}"]
+      values = ["arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/${var.cloudwatch_logs_export_bucket}"]
     }
   }
 }
