@@ -212,7 +212,7 @@ data "aws_iam_policy_document" "kms" {
 }
 
 resource "aws_kms_key" "kms" {
-  description             = "KMS key for ${var.name}"
+  description             = "KMS key for ${var.cloudwatch_logs_export_bucket}"
   deletion_window_in_days = 10
   enable_key_rotation     = true
   policy                  = join("", data.aws_iam_policy_document.kms.*.json)
