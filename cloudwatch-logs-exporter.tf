@@ -116,6 +116,10 @@ resource "aws_lambda_function" "log_exporter" {
       AWS_ACCOUNT = data.aws_caller_identity.current.account_id
     }
   }
+   depends_on = [
+    aws_iam_role_policy_attachment.lambda_logs,
+    aws_cloudwatch_log_group.this,
+  ]
 }
 
 resource "aws_cloudwatch_event_rule" "log_exporter" {
