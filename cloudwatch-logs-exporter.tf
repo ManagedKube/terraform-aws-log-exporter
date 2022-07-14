@@ -220,9 +220,12 @@ resource "aws_kms_key" "kms" {
   deletion_window_in_days = 10
   enable_key_rotation     = true
   policy                  = join("", data.aws_iam_policy_document.kms.*.json)
-  alias                   = "log-exporter-${var.cloudwatch_logs_export_bucket}"
 }
 
+resource "aws_kms_alias" "this" {
+  name          = "log-exporter-${var.cloudwatch_logs_export_bucket}"
+  target_key_id = aws_kms_key.kms.key_id
+}
 
 resource "aws_cloudwatch_log_group" "this" {
   name              = "/aws/lambda/${var.cloudwatch_logs_export_bucket}"
