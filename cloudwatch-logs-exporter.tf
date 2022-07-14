@@ -228,7 +228,7 @@ resource "aws_kms_alias" "this" {
 }
 
 resource "aws_cloudwatch_log_group" "this" {
-  name              = "/aws/lambda/${var.cloudwatch_logs_export_bucket}"
+  name              = "/aws/lambda/log-exporter-${var.cloudwatch_logs_export_bucket}"
   retention_in_days = 365
   kms_key_id = aws_kms_key.kms.arn
 }
